@@ -28,6 +28,7 @@ databaseChangeLog:
                     nullable: false
                     referencedTableName: items
                     referencedColumnNames: id
+                    foreignKeyName: fk_order_items_items
 
               - column:
                   name: quantity
