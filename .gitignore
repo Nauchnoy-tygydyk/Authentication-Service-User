@@ -46,3 +46,11 @@ User-service = Payment.txt
 ### Docker ###
 # postgres_data/
 # mongo_data/
+
+# Игнорировать сами исполняемые файлы Maven Wrapper во всех папках
+**/mvnw
+**/mvnw.cmd
+**/.mvn/
+
+# Игнорировать папки сборки во всех модулях (не только в корне)
+**/target/
