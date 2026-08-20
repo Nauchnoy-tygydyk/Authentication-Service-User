@@ -1,0 +1,91 @@
+services:
+  auth-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: identity_db
+    ports:
+      - "5433:5432"
+
+  user-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: user_db
+    ports:
+      - "5432:5432"
+
+  order-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: order_db
+    ports:
+      - "5434:5432"
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  kafka:
+    image: apache/kafka:latest
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+    ports:
+      - "9092:9092"
+
+  auth-service:
+    build: ./Authentication-service
+    environment:
+      - DB_URL=jdbc:postgresql://auth-db:5432/identity_db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - auth-db
+
+  user-service:
+    build: ./Payment
+    environment:
+      - DB_URL=jdbc:postgresql://user-db:5432/user_db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=redis
+    depends_on:
+      - user-db
+      - redis
+
+  order-service:
+    build: ./Order-service
+    environment:
+      - DB_URL=jdbc:postgresql://order-db:5432/order_db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - USER_SERVICE_URL=http://user-service:8083
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - order-db
+      - kafka
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - SERVICES_AUTH_URL=http://auth-service:8082
+      - SERVICES_USER_URL=http://user-service:8083
+      - SERVICES_ORDER_URL=http://order-service:8081
+    depends_on:
+      - auth-service
+      - user-service
+      - order-service
