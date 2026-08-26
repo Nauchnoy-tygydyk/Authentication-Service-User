@@ -22,7 +22,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "users")
-public class UserService {
+public class  UserService {
 
   private final IUserRepository userRepository;
 

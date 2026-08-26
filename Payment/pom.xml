@@ -61,6 +61,12 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Библиотеки JWT (те же, что и в Auth Service) -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
