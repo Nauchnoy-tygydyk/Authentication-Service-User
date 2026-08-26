@@ -22,7 +22,7 @@
         if (start == null || end == null){
           return null;
         }
-        return cb.between(root.get("сreatedAt"), start, end);
+        return cb.between(root.get("createdAt"), start, end);
       };
     }
       }
