@@ -43,4 +43,10 @@ public class AuthController {
     return authService.refreshToken(refreshToken);
   }
 
+  @DeleteMapping("/delete/{username}")
+  public ResponseEntity<Void> endpointDelete(@PathVariable String username) {
+    authService.deleteUser(username);
+    return ResponseEntity.noContent().build();
+  }
+
 }

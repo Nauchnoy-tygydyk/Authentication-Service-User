@@ -83,4 +83,9 @@ public class AuthService {
     }
     throw new BadCredentialsException("Refresh token is expired or not valid");
   }
+
+@Transactional
+  public void deleteUser(String username){
+    iUserCredentialsRepository.deleteByUsername(username);
+  }
 }

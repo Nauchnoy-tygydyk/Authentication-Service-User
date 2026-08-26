@@ -1,0 +1,17 @@
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\AuthenticationServiceApplication.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\client\IUserClient.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\config\AuthConfig.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\config\SecurityConfig.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\controller\AuthController.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\dto\AuthRequest.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\dto\AuthResponse.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\dto\UserDto.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\dto\UserResponse.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\entity\Role.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\entity\UserCredentials.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\exception\BadCredentialsException.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\exception\GlobalExceptionHandler.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\exception\UserAlreadyExistsException.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\repository\IUserCredentialsRepository.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\service\AuthService.java
+D:\PaymentProject\Authentication-service\src\main\java\org\example\authenticationservice\service\JwtService.java
