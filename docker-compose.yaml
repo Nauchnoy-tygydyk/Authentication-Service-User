@@ -1,0 +1,155 @@
+services:
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafka_container
+    environment:
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://${KAFKA_URL}
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+    ports:
+      - "9092:9092"
+    networks:
+      - auth-network
+
+  auth-db:
+    image: postgres:15-alpine
+    container_name: auth_db_container
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: identity_db
+    ports:
+      - "5433:5432"
+    networks:
+      - auth-network
+
+  user-db:
+    image: postgres:15-alpine
+    container_name: user_db_container
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: user_db
+    ports:
+      - "5432:5432"
+    networks:
+      - auth-network
+
+  order-db:
+    image: postgres:15-alpine
+    container_name: order_db_container
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: order_db
+    ports:
+      - "5434:5432"
+    networks:
+      - auth-network
+
+  payment-db:
+    image: mongo:6
+    container_name: payment_db_container
+    ports:
+      - "27017:27017"
+    networks:
+      - auth-network
+
+  redis:
+    image: redis:alpine
+    container_name: redis_container
+    ports:
+      - "6379:6379"
+    networks:
+      - auth-network
+
+
+  auth-service:
+    build: ./Authentication-service
+    container_name: auth_app_container
+    environment:
+      - DB_URL=jdbc:postgresql://auth-db:5432/identity_db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - USER_SERVICE_URL=${SERVICES_USER_URL}
+    depends_on:
+      - auth-db
+    networks:
+      - auth-network
+
+  user-service:
+    build: ./Payment
+    container_name: user_app_container
+    environment:
+      - DB_URL=jdbc:postgresql://user-db:5432/user_db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=redis
+    depends_on:
+      - user-db
+      - redis
+    networks:
+      - auth-network
+
+  order-service:
+    build: ./Order-service
+    container_name: order_app_container
+    ports:
+      - "8081:8081"
+    environment:
+      - DB_URL=jdbc:postgresql://order-db:5432/order_db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - USER_SERVICE_URL=${SERVICES_USER_URL}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_URL}
+    depends_on:
+      - order-db
+      - kafka
+    networks:
+      - auth-network
+
+  payment-service:
+    build: ./Payment-service
+    container_name: payment_app_container
+    ports:
+      - "8084:8084"
+    environment:
+      - MONGO_URL=mongodb://payment-db:27017/payment_db
+      - KAFKA_URL=${KAFKA_URL}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - payment-db
+      - kafka
+    networks:
+      - auth-network
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: gateway_app_container
+    ports:
+      - "8080:8080"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - SERVICES_AUTH_URL=${SERVICES_AUTH_URL}
+      - SERVICES_USER_URL=${SERVICES_USER_URL}
+      - SERVICES_ORDER_URL=${SERVICES_ORDER_URL}
+    depends_on:
+      - auth-service
+      - user-service
+      - order-service
+      - payment-service
+    networks:
+      - auth-network
+
+networks:
+  auth-network:
+    driver: bridge
