@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: Alex_Hlebko
+      changes:
+        - createIndex:
+            collectionName: payments
+            keys: "{'order_id': 1}"
+            options: "{'unique': true, 'name': 'order_id_unique_idx'}"
+
+        - createIndex:
+            collectionName: payments
+            keys: "{'user_id': 1}"
+            options: "{'name': 'user_id_idx'}"
+
+        - createIndex:
+            collectionName: payments
+            keys: "{'status': 1}"
+            options: "{'name': 'status_idx'}"
+
+        - createIndex:
+            collectionName: payments
+            keys: "{'timestamp': 1}"
+            options: "{'name': 'timestamp_idx'}"

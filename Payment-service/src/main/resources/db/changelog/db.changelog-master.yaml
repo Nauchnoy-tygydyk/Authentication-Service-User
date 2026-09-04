@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changeset/01-create-payments.yaml
+  - include:
+      file: db/changelog/changeset/02-add-payments-indexes.yaml
