@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Alex_Hlebko
+      changes:
+        - createCollection:
+            collectionName: payments
+
+        - runCommand:
+            command:
+              collMod: payments
+              validator:
+                $jsonSchema:
+                  bsonType: object
+                  required: ["order_id", "user_id", "status", "payment_amount", "timestamp"]
+                  properties:
+                    order_id:
+                      bsonType: long
+                    user_id:
+                      bsonType: long
+                    status:
+                      bsonType: string
+                      enum: ["NEW", "PENDING", "SUCCESS", "FAILED", "REFUNDED"]
+                    payment_amount:
+                      bsonType: decimal
+                    timestamp:
+                      bsonType: date
