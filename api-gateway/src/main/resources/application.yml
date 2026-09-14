@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      default-filters:
+        - AuthenticationFilter
+      routes:
+        - id: auth-service
+          uri: ${SERVICES_AUTH_URL:http://localhost:8082}
+          predicates:
+            - Path=/auth/**
+
+
+        - id: order-service
+          uri: ${SERVICES_ORDER_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/orders/**
+
+
+        - id: user-service
+          uri: ${SERVICES_USER_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/users/**, /api/cards/**
+
+services:
+  auth-service:
+    url: ${SERVICES_AUTH_URL:http://localhost:8082}
+  user-service:
+    url: ${SERVICES_USER_URL:http://localhost:8083}
